@@ -1,6 +1,6 @@
 
 import MouseLookController from './MouseLookController.js';
-import { Renderer, Scene, Node, Mesh, Primitive, BasicMaterial, CubeMapMaterial, PerspectiveCamera, vec3 } from '../lib/engine/index.js';
+import { Renderer, Scene, Node, Mesh, Primitive, BasicMaterial, PhongMaterial, CubeMapMaterial, PerspectiveCamera, vec3, Light } from '../lib/engine/index.js';
 
 // Create a Renderer and append the canvas element to the DOM.
 let renderer = new Renderer(window.innerWidth, window.innerHeight);
@@ -16,48 +16,48 @@ const sunMaterial = new BasicMaterial({
     map: renderer.loadTexture('resources/sun.jpg')
 });
 
-const earthMaterial = new BasicMaterial({
+const earthMaterial = new PhongMaterial({
     map: renderer.loadTexture('resources/earth_daymap.jpg')
 });
 
 // min kode for texturer/materiale:
-const moonMaterial = new BasicMaterial({
+const moonMaterial = new PhongMaterial({
     map: renderer.loadTexture('resources/2k_moon.jpg')
 });
 
-const marsMaterial = new BasicMaterial({
+const marsMaterial = new PhongMaterial({
     map: renderer.loadTexture('resources/2k_mars.jpg')
 });
 
-const mercuryMaterial = new BasicMaterial({
+const mercuryMaterial = new PhongMaterial({
     map: renderer.loadTexture('resources/2k_mercury.jpg')
 });
 
-const saturnMaterial = new BasicMaterial({
+const saturnMaterial = new PhongMaterial({
     map: renderer.loadTexture('resources/2k_saturn.jpg')
 });
 
-const meteoriteMaterial = new BasicMaterial({
+const meteoriteMaterial = new PhongMaterial({
     map: renderer.loadTexture('resources/meteorite.jpg')
 });
 
-const venusMaterial = new BasicMaterial({
+const venusMaterial = new PhongMaterial({
     map: renderer.loadTexture('resources/2k_venus_atmosphere.jpg')
 });
 
-const satelliteMaterial = new BasicMaterial({
+const satelliteMaterial = new PhongMaterial({
     map: renderer.loadTexture('resources/2k_eris_fictional.jpg')
 });
 
-const jupiterMaterial = new BasicMaterial({
+const jupiterMaterial = new PhongMaterial({
     map: renderer.loadTexture('resources/2k_jupiter.jpg')
 });
 
-const uranusMaterial = new BasicMaterial({
+const uranusMaterial = new PhongMaterial({
     map: renderer.loadTexture('resources/2k_uranus.jpg')
 });
 
-const neptuneMaterial = new BasicMaterial({
+const neptuneMaterial = new PhongMaterial({
     map: renderer.loadTexture('resources/2k_neptune.jpg')
 })
 
@@ -79,9 +79,16 @@ const sunPrimitive = Primitive.createSphere(sunMaterial, 32, 32);
 // (A Mesh can consist of multiple Primitives. )
 const sun = new Mesh([sunPrimitive]);
 
+//lagar lys i sola?:
+//todo fikse på lysverdiane?
+const lys = new Light();
+scene.add(lys);
+
 // Finally, we add the sun to our scene.
 // Only meshes that have been added to our scene, either as a child or as a descendant, will be drawn.
 scene.add(sun);
+
+
 
 // We also want to draw the earth, so we use the static method 'from' to create a new Primitive based on the previous one.
 // Using this function ensures that we're reusing the same buffers for geometry, while allowing us to specify a different material.
@@ -212,22 +219,23 @@ venusCenterNode.add(venus);
 //venus scale (true): 0.0086 -> 0.086
 venus.setScale(0.086, 0.086, 0.086);
 
-//TODO - geostationary satellite (opt)
+//geostationary satellite (opt)
+//fiksa slik at den ligg på jorda
 const satellitePrimitive = Primitive.from(sunPrimitive, satelliteMaterial);
 
-const satelliteOrbitNode = new Node(earthCenterNode);
+const satelliteOrbitNode = new Node(earth);
 
 const satelliteCenterNode = new Node(satelliteOrbitNode);
 
 //berre set ein distanse
-satelliteCenterNode.setTranslation(0.12, 0, 0);
+satelliteCenterNode.setTranslation(1.6, 0, 0);
 
 const satellite = new Mesh([satellitePrimitive]);
 
 satelliteCenterNode.add(satellite);
 
 //berre set ein skalering
-satellite.setScale(0.004, 0.004, 0.004);
+satellite.setScale(0.05, 0.05, 0.05);
 
 //lagar jupiter
 const jupiterPrimitive = Primitive.from(sunPrimitive, jupiterMaterial);
@@ -464,7 +472,8 @@ function loop(now) {
     venus.rotateY(orbitalRotationFactor * (365/243));
 
     //roterer satelitt - skal følgje jorda, så samme som earth.rotateY
-    satelliteOrbitNode.rotateY(orbitalRotationFactor * 365);
+    //fiksa det!
+    //satelliteOrbitNode.rotateY(orbitalRotationFactor * 365);
 
     //roterer jupiter
     jupiterOrbitNode.rotateY(orbitalRotationFactor * (365/4330.6));

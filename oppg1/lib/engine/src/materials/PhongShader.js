@@ -1,4 +1,4 @@
-import { Shader } from '../../lib/engine/index.js';
+import { Shader } from '../../index.js';
 
 import vertexShaderTemplate from './shaders/phong-vertex-shader.js';
 import fragmentShaderTemplate from './shaders/phong-fragment-shader.js';

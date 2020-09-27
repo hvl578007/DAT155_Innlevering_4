@@ -73,7 +73,7 @@ void main() {
         float lambertian = 0.0;
 
         // TODO: implement diffuse term.
-        lambertian = max(normal*lightDirection, 0);
+        lambertian = max(dot(normal, lightDirection), 0.0);
 
 
         float specular = 0.0;
@@ -82,7 +82,7 @@ void main() {
             float specAngle = 0.0;
             
             // TODO: implement specular term.
-            specAngle = max(reflectDirection*viewDirection, 0);
+            specAngle = max(dot(reflectDirection ,viewDirection), 0.0);
 
             specular = pow(specAngle, shininess);
         }
