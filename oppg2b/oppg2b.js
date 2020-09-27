@@ -11,6 +11,7 @@ let program1;
 let numVertices = 36;
 
 let canvas;
+/** @type {WebGL2RenderingContext} */
 let gl;
 
 let projectionMatrix;
@@ -57,7 +58,10 @@ let lightSpecular = vec4( 1.0, 1.0, 1.0, 1.0 );
 
 
 //TODO: Sett opp materialer for program1
-
+let mat1AmbientColor = vec4(0.24725, 0.1995, 0.0745, 1.0);
+let mat1DiffuseColor = vec4(0.75164, 0.60648, 0.22648, 1.0);
+let mat1SpecularColor = vec4(0.6282281, 0.555802, 0.366065, 1.0);
+let mat1Shininess = 51.2;
 
 let mat2AmbientColor = vec4( 0.19225, 0.19225, 0.19225, 1.0 );
 let mat2DiffuseColor = vec4( 0.50754, 0.50754, 0.50754, 1.0);
@@ -164,6 +168,7 @@ var shadedCube = function() {
         canvas = document.getElementById( "gl-canvas" );
 
         gl = canvas.getContext('webgl2');
+
         if (!gl) { alert( "WebGL 2.0 isn't available" ); }
 
 
@@ -178,6 +183,7 @@ var shadedCube = function() {
 
 
         //TODO: Initialiser program1
+        program1 = initShaders(gl, "./shaders/vshader1.glsl", "./shaders/fshader1.glsl");
 
         program2 = initShaders( gl, "./shaders/vshader2.glsl", "./shaders/fshader2.glsl" );
 
@@ -253,9 +259,41 @@ var shadedCube = function() {
 
 
         //TODO: Sett opp buffere og uniform-variabler for program1
+        gl.useProgram(program1);
 
+        nBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, nBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, flatten(normalsArray), gl.STATIC_DRAW);
+        
+        normalLoc = gl.getAttribLocation(program1, "aNormal");
+        gl.vertexAttribPointer(normalLoc, 3, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(normalLoc);
 
+        vBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, flatten(pointsArray), gl.STATIC_DRAW);
 
+        positionLoc = gl.getAttribLocation(program1, "aPosition");
+        gl.vertexAttribPointer(positionLoc, 4, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(positionLoc);
+
+        let ambientProduct1 = mult(lightAmbient, mat1AmbientColor);
+        let diffuseProduct1 = mult(lightDiffuse, mat1DiffuseColor);
+        let specularProduct1 = mult(lightSpecular, mat1SpecularColor);
+
+        gl.uniform4fv( gl.getUniformLocation(program1,
+            "ambientProduct"),flatten(ambientProduct1) );
+        gl.uniform4fv( gl.getUniformLocation(program1,
+            "diffuseProduct"),flatten(diffuseProduct1) );
+        gl.uniform4fv( gl.getUniformLocation(program1,
+            "specularProduct"),flatten(specularProduct1) );
+        gl.uniform4fv( gl.getUniformLocation(program1,
+            "lightPosition"),flatten(lightPosition) );
+        gl.uniform1f( gl.getUniformLocation(program1,
+            "shininess"), mat1Shininess );
+
+        gl.uniformMatrix4fv( gl.getUniformLocation(program1, "projectionMatrix"),
+            false, flatten(projectionMatrix));
 
 
         render();
@@ -330,6 +368,17 @@ var shadedCube = function() {
 
 
         //TODO: Tegn figurer ved å bruke program1 i tillegg
+        gl.useProgram(program1);
+
+        gl.uniform4fv( gl.getUniformLocation(program1,
+            "lightPosition"),flatten(lightPosition) );
+        
+        drawSphere(program1, leftSide);
+
+        drawCube(program1, leftSide);
+
+        drawCylinder(program1, leftSide);
+        
 
         //Program2
         gl.useProgram(program2);
