@@ -1,6 +1,6 @@
 
 import MouseLookController from './MouseLookController.js';
-import { Renderer, Scene, Node, Mesh, Primitive, BasicMaterial, PhongMaterial, CubeMapMaterial, PerspectiveCamera, vec3, Light } from '../lib/engine/index.js';
+import { Renderer, Scene, Node, Mesh, Primitive, BasicMaterial, PhongMaterial, CubeMapMaterial, PerspectiveCamera, vec3, Light, vec4 } from '../lib/engine/index.js';
 
 // Create a Renderer and append the canvas element to the DOM.
 let renderer = new Renderer(window.innerWidth, window.innerHeight);
@@ -81,7 +81,12 @@ const sun = new Mesh([sunPrimitive]);
 
 //lagar lys i sola?:
 //todo fikse på lysverdiane?
-const lys = new Light();
+const lys = new Light(
+    {
+        diffuse: vec4.fromValues(1.0, 1.0, 1.0, 1.0),
+        specular: vec4.fromValues(0.1, 0.1, 0.1, 1.0)
+    }
+);
 scene.add(lys);
 
 // Finally, we add the sun to our scene.
